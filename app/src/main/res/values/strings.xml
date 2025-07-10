@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">MiniCryptoTracker</string>
+
+    <!-- List screen -->
+    <string name="screen_list_title">Cryto List</string>
+
+    <!-- Details screen -->
+    <string name="screen_details_title">Crypto Details</string>
+    <string name="label_name">Name</string>
+    <string name="label_symbol">Symbol</string>
+    <string name="label_image_url">Image URL</string>
+    <string name="label_price">Price</string>
+    <string name="label_description">Description</string>
 </resources>
