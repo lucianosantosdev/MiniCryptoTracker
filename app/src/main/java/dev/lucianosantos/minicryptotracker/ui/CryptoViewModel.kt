@@ -28,7 +28,6 @@ class CryptoViewModel(
     fun fetchCryptoItems() {
         viewModelScope.launch {
             val items = cryptoRepository.fetchCryptoItems()
-
             _uiState.update {
                 it.copy(
                     cryptoItems = items.map {
