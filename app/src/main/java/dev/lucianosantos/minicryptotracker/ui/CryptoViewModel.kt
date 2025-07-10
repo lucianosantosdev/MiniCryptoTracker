@@ -26,6 +26,11 @@ class CryptoViewModel(
     )
 
     fun fetchCryptoItems() {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
         viewModelScope.launch {
             val items = cryptoRepository.fetchCryptoItems()
             _uiState.update {
@@ -40,8 +45,7 @@ class CryptoViewModel(
                             currentPrice = it.currentPrice
                         )
                     },
-                    isLoading = false,
-                    errorMessage = null
+                    isLoading = false
                 )
             }
         }

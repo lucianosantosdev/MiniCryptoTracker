@@ -8,9 +8,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +42,7 @@ fun CryptoListScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CryptoListScreenContent(
     cryptoItems: List<CryptoItem>,
@@ -48,15 +51,20 @@ fun CryptoListScreenContent(
     onRefresh: () -> Unit,
     onCryptoItemClick: (CryptoItem) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    PullToRefreshBox(
+        isRefreshing = isLoading,
+        onRefresh = onRefresh
     ) {
-        items(cryptoItems) { cryptoItem ->
-            CryptoListItem(
-                cryptoItem = cryptoItem,
-                onClick = onCryptoItemClick
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(cryptoItems) { cryptoItem ->
+                CryptoListItem(
+                    cryptoItem = cryptoItem,
+                    onClick = onCryptoItemClick
+                )
+            }
         }
     }
 }
