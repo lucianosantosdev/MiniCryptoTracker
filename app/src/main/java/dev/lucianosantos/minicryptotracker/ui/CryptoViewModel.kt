@@ -33,20 +33,21 @@ class CryptoViewModel(
         }
         viewModelScope.launch {
             val items = cryptoRepository.fetchCryptoItems()
-            _uiState.update {
-                it.copy(
-                    cryptoItems = items.map {
-                        CryptoItem(
-                            id = it.id,
-                            name = it.name,
-                            symbol = it.symbol,
-                            imageUrl = it.imageUrl,
-                            description = it.description,
-                            currentPrice = it.currentPrice
-                        )
-                    },
-                    isLoading = false
-                )
+            if (items.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = null,
+                        cryptoItems = items.getOrNull() ?: emptyList()
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = items.exceptionOrNull()?.message ?: "Unknown error"
+                    )
+                }
             }
         }
     }

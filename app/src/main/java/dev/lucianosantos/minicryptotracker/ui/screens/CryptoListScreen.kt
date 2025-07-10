@@ -11,6 +11,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -18,10 +20,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.lucianosantos.minicryptotracker.R
 import dev.lucianosantos.minicryptotracker.ui.CryptoItem
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
+import dev.lucianosantos.minicryptotracker.ui.LocalSnackbarHostState
 import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme
 
 @Composable
@@ -29,7 +35,6 @@ fun CryptoListScreen(
     viewModel: CryptoViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
     LaunchedEffect(Unit) {
         viewModel.fetchCryptoItems()
     }
@@ -51,6 +56,20 @@ fun CryptoListScreenContent(
     onRefresh: () -> Unit,
     onCryptoItemClick: (CryptoItem) -> Unit
 ) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    val context = LocalContext.current
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { errorMessage ->
+            val snackbarResult = snackbarHostState.showSnackbar(
+                message = errorMessage,
+                actionLabel = context.getString(R.string.snackbar_action_retry),
+                duration = SnackbarDuration.Long
+            )
+            if (snackbarResult == SnackbarResult.ActionPerformed) {
+                onRefresh()
+            }
+        }
+    }
     PullToRefreshBox(
         isRefreshing = isLoading,
         onRefresh = onRefresh

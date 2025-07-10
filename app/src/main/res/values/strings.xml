@@ -3,6 +3,7 @@
 
     <!-- List screen -->
     <string name="screen_list_title">Cryto List</string>
+    <string name="snackbar_action_retry">RETRY</string>
 
     <!-- Details screen -->
     <string name="screen_details_title">Crypto Details</string>

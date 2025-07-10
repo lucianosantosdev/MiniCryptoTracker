@@ -19,9 +19,11 @@ class CryptoRepositoryImpl: CryptoRepository {
                 .build()
             chain.proceed(request)
         }
+
         val client = OkHttpClient.Builder()
             .addInterceptor(headerInterceptor)
             .build()
+
         val json = Json {
             ignoreUnknownKeys = true
         }
@@ -33,11 +35,11 @@ class CryptoRepositoryImpl: CryptoRepository {
             .create(CoinGeckoAPI::class.java)
     }
 
-    override suspend fun fetchCryptoItems(): List<CryptoItem> {
-        val coins: List<CryptoItem> = try {
+    override suspend fun fetchCryptoItems(): Result<List<CryptoItem>> {
+        return try {
             val response = coinApi.getCoinsList()
             if (response.isSuccessful) {
-                response.body()?.map { coin ->
+                val items = response.body()?.map { coin ->
                     CryptoItem(
                         id = coin.id,
                         name = coin.name,
@@ -47,15 +49,14 @@ class CryptoRepositoryImpl: CryptoRepository {
                         currentPrice = 0L
                     )
                 } ?: emptyList()
+                Result.success(items)
             } else {
-                // Handle the error case, e.g., log it or throw an exception
-                emptyList()
+                val errorBody = response.errorBody()?.string()
+                Result.failure(Exception("Server error: ${response.code()} - ${errorBody ?: "Unknown"}"))
             }
-        } catch(e: Exception) {
-            // Handle the exception, e.g., log it or return an empty list
-            emptyList()
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        return coins
     }
 
     override suspend fun fetchCryptoItemById(id: String): Flow<CryptoItem> {

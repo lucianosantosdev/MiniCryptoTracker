@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
 
 class CryptoRepositoryFakeImpl: CryptoRepository {
-    override suspend fun fetchCryptoItems(): List<CryptoItem> {
-        return listOf(
+    override suspend fun fetchCryptoItems(): Result<List<CryptoItem>> {
+        return Result.success(listOf(
             CryptoItem(
                 id = "1",
                 name = "Bitcoin",
@@ -24,7 +24,7 @@ class CryptoRepositoryFakeImpl: CryptoRepository {
                 description = "Ethereum is a decentralized platform for smart contracts.",
                 currentPrice = 3000L
             )
-        )
+        ))
     }
 
     override suspend fun fetchCryptoItemById(id: String): Flow<CryptoItem> {
