@@ -10,6 +10,6 @@
     <string name="label_name">Name</string>
     <string name="label_symbol">Symbol</string>
     <string name="label_image_url">Image URL</string>
-    <string name="label_price">Price</string>
+    <string name="label_price">Price (USD)</string>
     <string name="label_description">Description</string>
 </resources>

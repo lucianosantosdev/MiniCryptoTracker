@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 
 class CryptoViewModel(
     private val cryptoRepository: CryptoRepository
-
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -67,7 +66,6 @@ class CryptoViewModel(
                     it.copy(
                         isLoading = false
                     )
-
                 }
                 _uiEvents.trySend(
             UiEvent.ShowError(items.exceptionOrNull()?.message ?: "Unknown error")
@@ -85,11 +83,33 @@ class CryptoViewModel(
         fetchCryptoItems()
     }
 
-    fun showCryptoDetail(cryptoDomain: CryptoDomain) {
+    fun fetchCryptoDetail(cryptoDomain: CryptoDomain) {
+        navigateTo(Route.CryptoDetail)
         _uiState.update {
-            it.copy(selectedCrypto = cryptoDomain, currentRoute = Route.CryptoDetail(cryptoDomain.id))
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch {
+            val result = cryptoRepository.getDetails(cryptoDomain.id)
+            if (result.isSuccess) {
+                val cryptoDetails = result.getOrNull()
+                if (cryptoDetails != null) {
+                    _uiState.update {
+                        it.copy(
+                            selectedCrypto = cryptoDetails
+                        )
+                    }
+                } else {
+                    _uiEvents.trySend(UiEvent.ShowError("Crypto details not found"))
+                }
+            } else {
+                _uiEvents.trySend(UiEvent.ShowError(result.exceptionOrNull()?.message ?: "Unknown error"))
+            }
+            _uiState.update {
+                it.copy(isLoading = false)
+            }
         }
     }
+
 
     fun navigateTo(route: Route) {
         _uiState.update {

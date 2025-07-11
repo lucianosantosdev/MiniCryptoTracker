@@ -13,7 +13,7 @@ class CryptoRepositoryFakeImpl: CryptoRepository {
             symbol = "BTC",
             imageUrl = "https://example.com/bitcoin.png",
             description = "Bitcoin is a decentralized digital currency.",
-            currentPrice = 50000L
+            currentPrice = 50000.0
         ),
         CryptoDomain(
             id = "2",
@@ -21,7 +21,7 @@ class CryptoRepositoryFakeImpl: CryptoRepository {
             symbol = "ETH",
             imageUrl = "https://example.com/ethereum.png",
             description = "Ethereum is a decentralized platform for smart contracts.",
-            currentPrice = 3000L
+            currentPrice = 3000.0
         )
     )
 
@@ -29,12 +29,12 @@ class CryptoRepositoryFakeImpl: CryptoRepository {
         get() = flowOf(fakeCoins)
 
     override suspend fun syncRemote(): Result<List<CryptoDomain>> {
-        delay(500)
+        delay(1000)
         return Result.success(fakeCoins)
     }
 
-    override suspend fun getDetails(id: String): CryptoDomain {
-        delay(200) // Simulate loading
-        return fakeCoins.first()
+    override suspend fun getDetails(id: String): Result<CryptoDomain> {
+        delay(1000)
+        return Result.success(fakeCoins.first())
     }
 }

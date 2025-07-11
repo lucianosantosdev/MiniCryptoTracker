@@ -41,8 +41,8 @@ val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-
     val context = LocalContext.current
+    context.deleteDatabase("crypto_database.db") // Clear previous database for testing purposes
     val database = Room.databaseBuilder(
         context = context,
         klass = CryptoDatabase::class.java,
@@ -87,9 +87,11 @@ fun App() {
                         }
                     },
                     actions = {
-                        if(uiState.currentRoute is Route.CryptoList) {
+                        if(uiState.currentRoute is Route.CryptoDetail) {
                             IconButton(onClick = {
-                                cryptoViewModel.refreshCryptoItems()
+                                cryptoViewModel.fetchCryptoDetail(
+                                    uiState.selectedCrypto!!
+                                )
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,

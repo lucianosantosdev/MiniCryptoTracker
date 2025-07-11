@@ -63,7 +63,7 @@ fun CryptoListScreen(
         cryptoDomains = uiState.cryptoDomains,
         isLoading = uiState.isLoading,
         onRefresh = viewModel::fetchCryptoItems,
-        onCryptoItemClick = viewModel::showCryptoDetail
+        onCryptoItemClick = viewModel::fetchCryptoDetail
     )
 }
 
@@ -135,7 +135,7 @@ fun CryptoListScreenContentPreview() {
                     symbol = "BTC",
                     imageUrl = "https://example.com/bitcoin.png",
                     description = "Bitcoin is a decentralized digital currency.",
-                    currentPrice = 50000L
+                    currentPrice = 50000.0
                 ),
                 CryptoDomain(
                     id = "2",
@@ -143,7 +143,7 @@ fun CryptoListScreenContentPreview() {
                     symbol = "ETH",
                     imageUrl = "https://example.com/ethereum.png",
                     description = "Ethereum is a decentralized platform for smart contracts.",
-                    currentPrice = 3000L
+                    currentPrice = 3000.0
                 )
             ),
             isLoading = false,
