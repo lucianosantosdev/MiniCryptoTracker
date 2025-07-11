@@ -25,10 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.room.Room
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoDetailScreen
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoListScreen
 import dev.lucianosantos.minicryptotracker.data.CryptoRepositoryImpl
+import dev.lucianosantos.minicryptotracker.database.CryptoDatabase
+import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
 
 val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")
@@ -37,7 +41,17 @@ val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    val repository = CryptoRepositoryImpl()
+
+    val context = LocalContext.current
+    val database = Room.databaseBuilder(
+        context = context,
+        klass = CryptoDatabase::class.java,
+        name = "crypto_database.db"
+    ).build()
+    val repository = CryptoRepositoryImpl(
+        cryptoDao = database.cryptoDao(),
+        coinGeckoAPI = CoinGeckoAPI.create()
+    )
     val cryptoViewModel = CryptoViewModel(
         repository
     )

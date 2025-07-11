@@ -1,10 +1,10 @@
 package dev.lucianosantos.minicryptotracker.ui
 
-data class CryptoItem(
+data class CryptoDomain(
     val id: String,
     val name: String,
     val symbol: String,
-    val imageUrl: String,
     val description: String,
-    val currentPrice: Long,
+    val imageUrl: String? = null,
+    val currentPrice: Long? = null,
 )

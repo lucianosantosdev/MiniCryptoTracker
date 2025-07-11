@@ -1,46 +1,35 @@
 package dev.lucianosantos.minicryptotracker.data
 
-import dev.lucianosantos.minicryptotracker.BuildConfig
+import dev.lucianosantos.minicryptotracker.database.CryptoDao
+import dev.lucianosantos.minicryptotracker.database.CryptoEntity
 import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
-import dev.lucianosantos.minicryptotracker.ui.CryptoItem
+import dev.lucianosantos.minicryptotracker.ui.CryptoDomain
 import kotlinx.coroutines.flow.Flow
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.flow.map
 
-class CryptoRepositoryImpl: CryptoRepository {
-    private val coinApi: CoinGeckoAPI by lazy {
-        val headerInterceptor = Interceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("X-API-KEY", BuildConfig.COINGECKO_API_KEY) // or the correct header name expected by the API
-                .build()
-            chain.proceed(request)
+class CryptoRepositoryImpl(
+    private val cryptoDao: CryptoDao,
+    private val coinGeckoAPI: CoinGeckoAPI
+): CryptoRepository {
+
+    override val cryptoCoins = cryptoDao.getAll().map { entities ->
+        entities.map { entity ->
+            CryptoDomain(
+                id = entity.id,
+                name = entity.name,
+                symbol = entity.symbol,
+                imageUrl = entity.image,
+                description = entity.description
+            )
         }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(headerInterceptor)
-            .build()
-
-        val json = Json {
-            ignoreUnknownKeys = true
-        }
-        Retrofit.Builder()
-            .baseUrl("https://api.coingecko.com/api/v3/")
-            .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
-            .create(CoinGeckoAPI::class.java)
     }
 
-    override suspend fun fetchCryptoItems(): Result<List<CryptoItem>> {
+    override suspend fun syncRemote(): Result<List<CryptoDomain>> {
         return try {
-            val response = coinApi.getCoinsList()
+            val response = coinGeckoAPI.getCoinsList()
             if (response.isSuccessful) {
                 val items = response.body()?.map { coin ->
-                    CryptoItem(
+                    CryptoDomain(
                         id = coin.id,
                         name = coin.name,
                         symbol = coin.symbol,
@@ -49,6 +38,7 @@ class CryptoRepositoryImpl: CryptoRepository {
                         currentPrice = 0L
                     )
                 } ?: emptyList()
+                cacheItems(items)
                 Result.success(items)
             } else {
                 val errorBody = response.errorBody()?.string()
@@ -59,7 +49,21 @@ class CryptoRepositoryImpl: CryptoRepository {
         }
     }
 
-    override suspend fun fetchCryptoItemById(id: String): Flow<CryptoItem> {
+    override suspend fun getDetails(id: String): CryptoDomain {
         TODO("Not yet implemented")
     }
+
+    private suspend fun cacheItems(cryptos: List<CryptoDomain>) {
+        cryptoDao.insertAll(cryptos.map { it.toEntity() })
+    }
+
+    private fun CryptoDomain.toEntity() = CryptoEntity(
+        id = this.id,
+        name = this.name,
+        symbol = this.symbol,
+        image = this.imageUrl,
+        description = this.description,
+        price = this.currentPrice
+    )
+
 }

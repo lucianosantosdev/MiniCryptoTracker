@@ -6,7 +6,6 @@ import dev.lucianosantos.minicryptotracker.data.CryptoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -18,12 +17,28 @@ class CryptoViewModel(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     data class UiState(
-        val cryptoItems: List<CryptoItem> = emptyList(),
+        val cryptoDomains: List<CryptoDomain> = emptyList(),
         val isLoading: Boolean = false,
         val errorMessage: String? = null,
         val currentRoute: Route = Route.CryptoList,
-        val selectedCrypto: CryptoItem? = null
+        val selectedCrypto: CryptoDomain? = null
     )
+
+    init {
+        viewModelScope.launch {
+            cryptoRepository.cryptoCoins.collect { items ->
+                if (items.isEmpty()) {
+                    fetchCryptoItems()
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            cryptoDomains = items
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     fun fetchCryptoItems() {
         _uiState.update {
@@ -32,13 +47,13 @@ class CryptoViewModel(
             )
         }
         viewModelScope.launch {
-            val items = cryptoRepository.fetchCryptoItems()
+            val items = cryptoRepository.syncRemote()
             if (items.isSuccess) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         errorMessage = null,
-                        cryptoItems = items.getOrNull() ?: emptyList()
+                        cryptoDomains = items.getOrNull() ?: emptyList()
                     )
                 }
             } else {
@@ -61,9 +76,10 @@ class CryptoViewModel(
         }
         fetchCryptoItems()
     }
-    fun showCryptoDetail(cryptoItem: CryptoItem) {
+
+    fun showCryptoDetail(cryptoDomain: CryptoDomain) {
         _uiState.update {
-            it.copy(selectedCrypto = cryptoItem, currentRoute = Route.CryptoDetail(cryptoItem.id))
+            it.copy(selectedCrypto = cryptoDomain, currentRoute = Route.CryptoDetail(cryptoDomain.id))
         }
     }
 
