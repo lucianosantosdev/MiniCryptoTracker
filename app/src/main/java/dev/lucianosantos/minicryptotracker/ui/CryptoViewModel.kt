@@ -3,9 +3,11 @@ package dev.lucianosantos.minicryptotracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.lucianosantos.minicryptotracker.data.CryptoRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -16,13 +18,19 @@ class CryptoViewModel(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _uiEvents = Channel<UiEvent>()
+    val uiEvents = _uiEvents.receiveAsFlow()
+
     data class UiState(
         val cryptoDomains: List<CryptoDomain> = emptyList(),
         val isLoading: Boolean = false,
-        val errorMessage: String? = null,
         val currentRoute: Route = Route.CryptoList,
         val selectedCrypto: CryptoDomain? = null
     )
+
+    sealed class UiEvent {
+        data class ShowError(val message: String) : UiEvent()
+    }
 
     init {
         viewModelScope.launch {
@@ -51,18 +59,19 @@ class CryptoViewModel(
             if (items.isSuccess) {
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
-                        errorMessage = null,
-                        cryptoDomains = items.getOrNull() ?: emptyList()
+                        isLoading = false
                     )
                 }
             } else {
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
-                        errorMessage = items.exceptionOrNull()?.message ?: "Unknown error"
+                        isLoading = false
                     )
+
                 }
+                _uiEvents.trySend(
+            UiEvent.ShowError(items.exceptionOrNull()?.message ?: "Unknown error")
+                )
             }
         }
     }
@@ -70,8 +79,7 @@ class CryptoViewModel(
     fun refreshCryptoItems() {
         _uiState.update {
             it.copy(
-                isLoading = true,
-                errorMessage = null
+                isLoading = true
             )
         }
         fetchCryptoItems()
@@ -88,6 +96,4 @@ class CryptoViewModel(
             it.copy(currentRoute = route)
         }
     }
-
-
 }

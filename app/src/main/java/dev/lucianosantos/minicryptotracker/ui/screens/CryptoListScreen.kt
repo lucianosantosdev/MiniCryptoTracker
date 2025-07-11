@@ -22,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import dev.lucianosantos.minicryptotracker.R
 import dev.lucianosantos.minicryptotracker.ui.CryptoDomain
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
@@ -32,11 +35,33 @@ import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme
 fun CryptoListScreen(
     viewModel: CryptoViewModel
 ) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvents.collect { event ->
+                when (event) {
+                    is CryptoViewModel.UiEvent.ShowError -> {
+                        val errorMessage = event.message
+                        val snackbarResult = snackbarHostState.showSnackbar(
+                            message = errorMessage,
+                            actionLabel = context.getString(R.string.snackbar_action_retry),
+                            duration = SnackbarDuration.Long
+                        )
+                        if (snackbarResult == SnackbarResult.ActionPerformed) {
+                            viewModel.fetchCryptoItems()
+                        }
+                    }
+                }
+            }
+        }
+    }
     CryptoListScreenContent(
         cryptoDomains = uiState.cryptoDomains,
         isLoading = uiState.isLoading,
-        errorMessage = uiState.errorMessage,
         onRefresh = viewModel::fetchCryptoItems,
         onCryptoItemClick = viewModel::showCryptoDetail
     )
@@ -47,24 +72,9 @@ fun CryptoListScreen(
 fun CryptoListScreenContent(
     cryptoDomains: List<CryptoDomain>,
     isLoading: Boolean,
-    errorMessage: String?,
     onRefresh: () -> Unit,
     onCryptoItemClick: (CryptoDomain) -> Unit
 ) {
-    val snackbarHostState = LocalSnackbarHostState.current
-    val context = LocalContext.current
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let { errorMessage ->
-            val snackbarResult = snackbarHostState.showSnackbar(
-                message = errorMessage,
-                actionLabel = context.getString(R.string.snackbar_action_retry),
-                duration = SnackbarDuration.Long
-            )
-            if (snackbarResult == SnackbarResult.ActionPerformed) {
-                onRefresh()
-            }
-        }
-    }
     PullToRefreshBox(
         isRefreshing = isLoading,
         onRefresh = onRefresh
@@ -137,7 +147,6 @@ fun CryptoListScreenContentPreview() {
                 )
             ),
             isLoading = false,
-            errorMessage = null,
             onCryptoItemClick = {},
             onRefresh = { }
         )
