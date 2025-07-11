@@ -40,22 +40,10 @@ val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
-    val context = LocalContext.current
-    context.deleteDatabase("crypto_database.db") // Clear previous database for testing purposes
-    val database = Room.databaseBuilder(
-        context = context,
-        klass = CryptoDatabase::class.java,
-        name = "crypto_database.db"
-    ).build()
-    val repository = CryptoRepositoryImpl(
-        cryptoDao = database.cryptoDao(),
-        coinGeckoAPI = CoinGeckoAPI.create()
-    )
-    val cryptoViewModel = CryptoViewModel(
-        repository
-    )
-    val uiState by cryptoViewModel.uiState.collectAsState()
+fun App(
+    viewModel: CryptoViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
@@ -76,7 +64,7 @@ fun App() {
                     navigationIcon = {
                         if(uiState.currentRoute is Route.CryptoDetail) {
                             IconButton(onClick = {
-                                cryptoViewModel.navigateTo(Route.CryptoList)
+                                viewModel.navigateTo(Route.CryptoList)
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -89,7 +77,7 @@ fun App() {
                     actions = {
                         if(uiState.currentRoute is Route.CryptoDetail) {
                             IconButton(onClick = {
-                                cryptoViewModel.fetchCryptoDetail(
+                                viewModel.fetchCryptoDetail(
                                     uiState.selectedCrypto!!
                                 )
                             }) {
@@ -112,12 +100,12 @@ fun App() {
                 when(uiState.currentRoute) {
                     is Route.CryptoList -> {
                         CryptoListScreen(
-                            viewModel = cryptoViewModel
+                            viewModel = viewModel
                         )
                     }
                     is Route.CryptoDetail -> {
                         CryptoDetailScreen(
-                            viewModel = cryptoViewModel
+                            viewModel = viewModel
                         )
                     }
                 }
