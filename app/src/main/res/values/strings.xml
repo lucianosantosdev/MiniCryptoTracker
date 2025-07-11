@@ -12,4 +12,5 @@
     <string name="label_image_url">Image URL</string>
     <string name="label_price">Price (USD)</string>
     <string name="label_description">Description</string>
+    <string name="error_image_not_found">Image not found</string>
 </resources>

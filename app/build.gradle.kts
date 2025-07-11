@@ -83,4 +83,8 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.androidx.room.testing)
+    // Coil for image caching
+    implementation(libs.coil.compose.core)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
