@@ -1,4 +1,4 @@
-package dev.lucianosantos.minicryptotracker.ui
+package dev.lucianosantos.minicryptotracker.model
 
 data class CryptoDomain(
     val id: String,

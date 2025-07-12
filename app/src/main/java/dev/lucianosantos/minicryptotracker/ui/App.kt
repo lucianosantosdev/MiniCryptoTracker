@@ -1,12 +1,10 @@
 package dev.lucianosantos.minicryptotracker.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,14 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.room.Room
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoDetailScreen
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoListScreen
-import dev.lucianosantos.minicryptotracker.data.CryptoRepositoryImpl
-import dev.lucianosantos.minicryptotracker.database.CryptoDatabase
-import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
 
 val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")

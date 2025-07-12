@@ -26,7 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import dev.lucianosantos.minicryptotracker.R
-import dev.lucianosantos.minicryptotracker.ui.CryptoDomain
+import dev.lucianosantos.minicryptotracker.model.CryptoDomain
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
 import dev.lucianosantos.minicryptotracker.ui.LocalSnackbarHostState
 import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme

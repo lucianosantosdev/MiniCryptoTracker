@@ -1,12 +1,10 @@
-package dev.lucianosantos.minicryptotracker.data
+package dev.lucianosantos.minicryptotracker.model
 
 import dev.lucianosantos.minicryptotracker.database.CryptoDao
 import dev.lucianosantos.minicryptotracker.database.CryptoEntity
 import dev.lucianosantos.minicryptotracker.network.CoinDetailsDto
 import dev.lucianosantos.minicryptotracker.network.CoinDto
 import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
-import dev.lucianosantos.minicryptotracker.ui.CryptoDomain
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class CryptoRepositoryImpl(

@@ -49,6 +49,7 @@ import coil3.request.ImageRequest
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
 import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme
 import dev.lucianosantos.minicryptotracker.R
+import dev.lucianosantos.minicryptotracker.utils.toUsdCurrencyString
 import java.util.Locale
 
 @Composable
@@ -132,11 +133,6 @@ fun CryptoImage(
             }
         )
     }
-}
-
-fun Double.toUsdCurrencyString(): String {
-    val format: NumberFormat = NumberFormat.getCurrencyInstance(Locale.US)
-    return format.format(this)
 }
 
 @Composable

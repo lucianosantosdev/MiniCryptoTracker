@@ -1,6 +1,5 @@
-package dev.lucianosantos.minicryptotracker.data
+package dev.lucianosantos.minicryptotracker.model
 
-import dev.lucianosantos.minicryptotracker.ui.CryptoDomain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

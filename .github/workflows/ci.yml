@@ -27,6 +27,18 @@ jobs:
       run: |
         echo "COINGECKO_API_KEY=${{ secrets.COINGECKO_API_KEY }}" > local.properties
     
+
+    - name: Run unit tests
+      run: ./gradlew testDebugUnitTest
+
+    - name: Test Report
+      uses: dorny/test-reporter@v2.1.1      
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+        name: JUnit Tests
+        path: '**/TEST-*.xml'
+        reporter: 'java-junit'
+
     - name: Run build
       run: ./gradlew build
 
