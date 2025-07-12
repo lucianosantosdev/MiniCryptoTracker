@@ -2,6 +2,7 @@ package dev.lucianosantos.minicryptotracker.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -89,44 +91,58 @@ fun CryptoListScreenContent(
         isRefreshing = isLoading,
         onRefresh = onRefresh
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = searchQuery,
-                    onValueChange = { query -> searchQuery = query },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null
-                        )
-                    },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                    }
-                )
-            }
-            items(filteredCryptoList) { cryptoItem ->
-                CryptoListItem(
-                    cryptoDomain = cryptoItem,
-                    onClick = onCryptoItemClick
-                )
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query -> searchQuery = query }
+            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(filteredCryptoList) { cryptoItem ->
+                    CryptoListItem(
+                        cryptoDomain = cryptoItem,
+                        onClick = onCryptoItemClick
+                    )
+                }
             }
         }
     }
 }
 
+@Composable
+fun SearchBar(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        modifier = modifier.fillMaxWidth(),
+        value = searchQuery,
+        onValueChange = onSearchQueryChange,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null
+            )
+        },
+        trailingIcon = {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(onClick = { onSearchQueryChange("") }) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
+        placeholder = { Text(text = stringResource(R.string.search_bar_hint)) }
+    )
+}
 @Composable
 fun CryptoListItem(
     cryptoDomain: CryptoDomain,

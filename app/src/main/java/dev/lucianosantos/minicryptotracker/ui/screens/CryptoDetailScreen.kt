@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import coil3.ColorImage
 import coil3.annotation.ExperimentalCoilApi
@@ -41,6 +41,7 @@ import coil3.compose.SubcomposeAsyncImage
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
 import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme
 import dev.lucianosantos.minicryptotracker.R
+import dev.lucianosantos.minicryptotracker.model.CryptoDomain
 import dev.lucianosantos.minicryptotracker.ui.LocalSnackbarHostState
 import dev.lucianosantos.minicryptotracker.utils.ObserveAsEvents
 import dev.lucianosantos.minicryptotracker.utils.toUsdCurrencyString
@@ -74,22 +75,14 @@ fun CryptoDetailScreen(
     }
     CryptoDetailScreenContent(
         isLoading = uiState.isLoading,
-        name = uiState.selectedCrypto?.name ?: "Unknown",
-        symbol = uiState.selectedCrypto?.symbol ?: "Unknown",
-        imageUrl = uiState.selectedCrypto?.imageUrl ?: "",
-        description = uiState.selectedCrypto?.description ?: "No description available",
-        currentPrice = uiState.selectedCrypto?.currentPrice ?: 0.0
+        crypto = uiState.selectedCrypto
     )
 }
 
 @Composable
 fun CryptoDetailScreenContent(
     isLoading: Boolean,
-    name: String,
-    symbol: String,
-    imageUrl: String,
-    description: String,
-    currentPrice: Double
+    crypto: CryptoDomain? = null,
 ) {
     if (isLoading) {
         Box(
@@ -100,17 +93,27 @@ fun CryptoDetailScreenContent(
         }
         return
     }
-    Card {
-        CryptoImage(
+    crypto?.let {
+        val scrollState = rememberScrollState()
+        Card(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp),
-            imageUrl = imageUrl
-        )
-        DetailItem(R.string.label_name, name)
-        DetailItem(R.string.label_symbol, symbol)
-        DetailItem(R.string.label_price, currentPrice.toUsdCurrencyString())
-        DetailItem(R.string.label_description, description)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
+            CryptoImage(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp),
+                imageUrl = it.imageUrl ?: ""
+            )
+            DetailItem(R.string.label_name, it.name)
+            DetailItem(R.string.label_symbol, it.symbol)
+            DetailItem(R.string.label_price, it.currentPrice?.toUsdCurrencyString() ?: stringResource(R.string.label_no_price))
+            DetailItem(
+                R.string.label_description,
+                it.description.takeUnless { it.isNullOrEmpty() } ?: stringResource(R.string.label_no_description)
+            )
+        }
     }
 }
 
@@ -155,16 +158,12 @@ fun DetailItem(
     @StringRes label: Int,
     value: String
 ) {
-    val scrollState = rememberScrollState()
     ListItem(
         modifier = Modifier.padding(16.dp),
         overlineContent = { Text(text = stringResource(label)) },
         headlineContent = {
             Box(
-                modifier = Modifier
-                    .heightIn(max = 200.dp)
-                    .verticalScroll(scrollState)
-                    .padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp)
             ) {
                 Text(text = value)
             }
@@ -174,20 +173,22 @@ fun DetailItem(
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-@Preview(showSystemUi = true)
+@PreviewScreenSizes
 fun CryptoDetailScreenPreview() {
     MiniCryptoTrackerTheme {
         val previewHandler = AsyncImagePreviewHandler {
             ColorImage(Color.Red.toArgb())
         }
-
         CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
             CryptoDetailScreenContent(
-                name = "Bitcoin",
-                symbol = "BTC",
-                imageUrl = "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
-                description = "Bitcoin is a decentralized digital currency.",
-                currentPrice = 50000.0,
+                crypto = CryptoDomain(
+                    id = "1",
+                    name = "Bitcoin",
+                    symbol = "BTC",
+                    imageUrl = "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
+                    description = "Bitcoin is a decentralized digital currency.",
+                    currentPrice = 50000.0
+                ),
                 isLoading = false
             )
         }

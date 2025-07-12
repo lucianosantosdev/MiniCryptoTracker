@@ -46,7 +46,6 @@ fun App(
     viewModel: CryptoViewModel
 ) {
     var currentRoute: Route by remember { mutableStateOf(Route.CryptoList) }
-    val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
