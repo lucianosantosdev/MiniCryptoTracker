@@ -22,7 +22,7 @@ class CryptoViewModel(
     val uiEvents = _uiEvents.receiveAsFlow()
 
     data class UiState(
-        val cryptoDomains: List<CryptoDomain> = emptyList(),
+        val cryptoList: List<CryptoDomain> = emptyList(),
         val isLoading: Boolean = false,
         val currentRoute: Route = Route.CryptoList,
         val selectedCrypto: CryptoDomain? = null
@@ -40,7 +40,7 @@ class CryptoViewModel(
                 } else {
                     _uiState.update {
                         it.copy(
-                            cryptoDomains = items
+                            cryptoList = items
                         )
                     }
                 }
