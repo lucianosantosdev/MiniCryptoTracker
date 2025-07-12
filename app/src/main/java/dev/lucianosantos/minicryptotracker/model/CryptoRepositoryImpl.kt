@@ -24,7 +24,7 @@ class CryptoRepositoryImpl(
         }
     }
 
-    override suspend fun syncRemote(): Result<List<CryptoDomain>> {
+    override suspend fun syncRemote(): Result<Unit> {
         return try {
             val response = coinGeckoAPI.getCoinsList()
             if (response.isSuccessful) {
@@ -32,7 +32,7 @@ class CryptoRepositoryImpl(
                     coin.toDomain()
                 } ?: emptyList()
                 cacheItems(items)
-                Result.success(items)
+                Result.success(Unit)
             } else {
                 val errorBody = response.errorBody()?.string()
                 Result.failure(Exception("Server error: ${response.code()} - ${errorBody ?: "Unknown"}"))

@@ -27,9 +27,9 @@ class CryptoRepositoryFakeImpl: CryptoRepository {
     override val cryptoCoins: Flow<List<CryptoDomain>>
         get() = flowOf(fakeCoins)
 
-    override suspend fun syncRemote(): Result<List<CryptoDomain>> {
+    override suspend fun syncRemote(): Result<Unit> {
         delay(1000)
-        return Result.success(fakeCoins)
+        return Result.success(Unit)
     }
 
     override suspend fun getDetails(id: String): Result<CryptoDomain> {
