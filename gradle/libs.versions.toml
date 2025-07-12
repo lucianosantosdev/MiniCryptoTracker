@@ -15,6 +15,7 @@ ksp= "2.2.0-2.0.2"
 coil = "3.2.0"
 mockk = "1.14.4"
 kotlinxCoroutines = "1.10.2"
+turbine = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,7 +51,9 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
+# coroutines tests
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
