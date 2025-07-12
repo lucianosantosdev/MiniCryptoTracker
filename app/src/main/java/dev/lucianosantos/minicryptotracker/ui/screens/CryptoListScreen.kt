@@ -38,6 +38,7 @@ import dev.lucianosantos.minicryptotracker.model.CryptoDomain
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
 import dev.lucianosantos.minicryptotracker.ui.LocalSnackbarHostState
 import dev.lucianosantos.minicryptotracker.ui.theme.MiniCryptoTrackerTheme
+import dev.lucianosantos.minicryptotracker.utils.ObserveAsEvents
 
 @Composable
 fun CryptoListScreen(
@@ -46,23 +47,18 @@ fun CryptoListScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner.lifecycle) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.uiEvents.collect { event ->
-                when (event) {
-                    is CryptoViewModel.UiEvent.ShowError -> {
-                        val errorMessage = event.message
-                        val snackbarResult = snackbarHostState.showSnackbar(
-                            message = errorMessage,
-                            actionLabel = context.getString(R.string.snackbar_action_retry),
-                            duration = SnackbarDuration.Long
-                        )
-                        if (snackbarResult == SnackbarResult.ActionPerformed) {
-                            viewModel.fetchCryptoItems()
-                        }
-                    }
+    ObserveAsEvents(viewModel.uiEvents) { event ->
+        when (event) {
+            is CryptoViewModel.UiEvent.ShowError -> {
+                val errorMessage = event.message
+                val snackbarResult = snackbarHostState.showSnackbar(
+                    message = errorMessage,
+                    actionLabel = context.getString(R.string.snackbar_action_retry),
+                    duration = SnackbarDuration.Long
+                )
+                if (snackbarResult == SnackbarResult.ActionPerformed) {
+                    viewModel.fetchCryptoItems()
                 }
             }
         }
