@@ -1,5 +1,6 @@
-package dev.lucianosantos.minicryptotracker.utils
+package dev.lucianosantos.minicryptotracker
 
+import dev.lucianosantos.minicryptotracker.utils.toUsdCurrencyString
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
