@@ -42,7 +42,8 @@ import dev.lucianosantos.minicryptotracker.utils.ObserveAsEvents
 
 @Composable
 fun CryptoListScreen(
-    viewModel: CryptoViewModel
+    viewModel: CryptoViewModel,
+    onCryptoItemClick: (CryptoDomain) -> Unit
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalContext.current
@@ -67,7 +68,7 @@ fun CryptoListScreen(
         cryptoList = uiState.cryptoList,
         isLoading = uiState.isLoading,
         onRefresh = viewModel::fetchCryptoItems,
-        onCryptoItemClick = viewModel::fetchCryptoDetail
+        onCryptoItemClick = onCryptoItemClick
     )
 }
 

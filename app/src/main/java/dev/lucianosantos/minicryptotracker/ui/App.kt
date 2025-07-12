@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,11 +33,19 @@ val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")
 }
 
+sealed class Route {
+    object CryptoList: Route()
+    data class CryptoDetail(
+        val cryptoId: String
+    ): Route()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
     viewModel: CryptoViewModel
 ) {
+    var currentRoute: Route by remember { mutableStateOf(Route.CryptoList) }
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -55,9 +65,9 @@ fun App(
                         )
                     },
                     navigationIcon = {
-                        if(uiState.currentRoute is Route.CryptoDetail) {
+                        if(currentRoute is Route.CryptoDetail) {
                             IconButton(onClick = {
-                                viewModel.navigateTo(Route.CryptoList)
+                                currentRoute = Route.CryptoList
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -68,10 +78,10 @@ fun App(
                         }
                     },
                     actions = {
-                        if(uiState.currentRoute is Route.CryptoDetail) {
+                        if(currentRoute is Route.CryptoDetail) {
                             IconButton(onClick = {
                                 viewModel.fetchCryptoDetail(
-                                    uiState.selectedCrypto!!
+                                    cryptoId = (currentRoute as Route.CryptoDetail).cryptoId
                                 )
                             }) {
                                 Icon(
@@ -90,14 +100,18 @@ fun App(
                     .padding(innerPadding)
                     .padding(16.dp)
             ) {
-                when(uiState.currentRoute) {
+                when(currentRoute) {
                     is Route.CryptoList -> {
                         CryptoListScreen(
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            onCryptoItemClick = { crypto ->
+                                currentRoute = Route.CryptoDetail(cryptoId = crypto.id)
+                            }
                         )
                     }
                     is Route.CryptoDetail -> {
                         CryptoDetailScreen(
+                            cryptoId = (currentRoute as Route.CryptoDetail).cryptoId,
                             viewModel = viewModel
                         )
                     }

@@ -24,7 +24,6 @@ class CryptoViewModel(
     data class UiState(
         val cryptoList: List<CryptoDomain> = emptyList(),
         val isLoading: Boolean = false,
-        val currentRoute: Route = Route.CryptoList,
         val selectedCrypto: CryptoDomain? = null
     )
 
@@ -75,13 +74,12 @@ class CryptoViewModel(
         }
     }
 
-    fun fetchCryptoDetail(cryptoDomain: CryptoDomain) {
-        navigateTo(Route.CryptoDetail)
+    fun fetchCryptoDetail(cryptoId: String) {
         _uiState.update {
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            val result = cryptoRepository.getDetails(cryptoDomain.id)
+            val result = cryptoRepository.getDetails(cryptoId)
             if (result.isSuccess) {
                 val cryptoDetails = result.getOrNull()
                 if (cryptoDetails != null) {
@@ -99,13 +97,6 @@ class CryptoViewModel(
             _uiState.update {
                 it.copy(isLoading = false)
             }
-        }
-    }
-
-
-    fun navigateTo(route: Route) {
-        _uiState.update {
-            it.copy(currentRoute = route)
         }
     }
 }

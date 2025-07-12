@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,12 +47,16 @@ import dev.lucianosantos.minicryptotracker.utils.toUsdCurrencyString
 
 @Composable
 fun CryptoDetailScreen(
+    cryptoId: String,
     viewModel: CryptoViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalPlatformContext.current
 
+    LaunchedEffect(cryptoId) {
+        viewModel.fetchCryptoDetail(cryptoId)
+    }
     ObserveAsEvents(viewModel.uiEvents) { event ->
         when (event) {
             is CryptoViewModel.UiEvent.ShowError -> {
@@ -62,7 +67,7 @@ fun CryptoDetailScreen(
                     duration = SnackbarDuration.Long
                 )
                 if (snackbarResult == SnackbarResult.ActionPerformed) {
-                    viewModel.fetchCryptoDetail(uiState.selectedCrypto!!)
+                    viewModel.fetchCryptoDetail(cryptoId)
                 }
             }
         }
