@@ -1,6 +1,7 @@
 package dev.lucianosantos.minicryptotracker.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dev.lucianosantos.minicryptotracker.R
 import dev.lucianosantos.minicryptotracker.model.CryptoDomain
@@ -93,6 +94,18 @@ class CryptoViewModel(
             _uiState.update {
                 it.copy(isLoading = false)
             }
+        }
+    }
+
+    class CryptoViewModelFactory(
+        private val repository: CryptoRepository
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(CryptoViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return CryptoViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

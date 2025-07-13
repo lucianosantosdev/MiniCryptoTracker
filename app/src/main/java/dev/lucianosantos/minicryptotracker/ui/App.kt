@@ -25,7 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.lucianosantos.minicryptotracker.R
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoDetailScreen
 import dev.lucianosantos.minicryptotracker.ui.screens.CryptoListScreen
 
@@ -60,7 +62,7 @@ fun App(
                     ),
                     title = {
                         Text(
-                            text = "Mini Crypto Tracker"
+                            text = stringResource(R.string.app_name),
                         )
                     },
                     navigationIcon = {
@@ -70,7 +72,7 @@ fun App(
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "No navigation",
+                                    contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
@@ -85,7 +87,7 @@ fun App(
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Navigate back to list",
+                                    contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }

@@ -165,7 +165,7 @@ fun CryptoListItem(
         trailingContent = {
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Navigate to details",
+                contentDescription = null,
             )
         },
         tonalElevation = 4.dp,
