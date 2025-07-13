@@ -3,7 +3,11 @@ package dev.lucianosantos.minicryptotracker
 import app.cash.turbine.test
 import dev.lucianosantos.minicryptotracker.model.CryptoDomain
 import dev.lucianosantos.minicryptotracker.data.CryptoRepository
+import dev.lucianosantos.minicryptotracker.model.AppError
+import dev.lucianosantos.minicryptotracker.model.AppException
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
+import dev.lucianosantos.minicryptotracker.ui.toUiString
+import dev.lucianosantos.minicryptotracker.utils.UiString
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -130,13 +134,11 @@ class CryptoViewModelTest {
         assertEquals(testCryptoList, viewModel.uiState.value.cryptoList)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Should emit ShowError event when fetching remote data fails`() = runTest {
         // Given
         val viewModel = defaultTestViewModel
-        val errorMessage = "Network error"
-        coEvery { mockCryptoRepository.syncRemote() } returns Result.failure(Exception(errorMessage))
+        coEvery { mockCryptoRepository.syncRemote() } returns Result.failure(AppException(AppError.Network))
 
         viewModel.uiEvents.test {
             // When
@@ -144,7 +146,9 @@ class CryptoViewModelTest {
             // then
             val event = awaitItem()
             assert(event is CryptoViewModel.UiEvent.ShowError)
-            assertEquals(errorMessage, (event as CryptoViewModel.UiEvent.ShowError).message)
+            val expectedError = AppException(AppError.Network).toUiString() as UiString.StringRes
+            val actual = (event as CryptoViewModel.UiEvent.ShowError).message as UiString.StringRes
+            assertEquals(expectedError.resId, actual.resId)
         }
     }
 
@@ -153,7 +157,6 @@ class CryptoViewModelTest {
         // Given
         val viewModel = defaultTestViewModel
         val cryptoId = "1"
-        val fakeIncompleteCrypto = CryptoDomain(cryptoId, "Bitcoin", "BTC")
         val fakeDetailedCrypto = CryptoDomain(
             id = cryptoId,
             name = "Bitcoin",
@@ -165,7 +168,7 @@ class CryptoViewModelTest {
         coEvery { mockCryptoRepository.getDetails(cryptoId) } returns Result.success(fakeDetailedCrypto)
 
         // When
-        viewModel.fetchCryptoDetail(fakeIncompleteCrypto)
+        viewModel.fetchCryptoDetail(cryptoId)
 
         // Then
         assertEquals(fakeDetailedCrypto, viewModel.uiState.value.selectedCrypto)
@@ -176,17 +179,17 @@ class CryptoViewModelTest {
         // Given
         val viewModel = defaultTestViewModel
         val cryptoId = "1"
-        val fakeIncompleteCrypto = CryptoDomain(cryptoId, "Bitcoin", "BTC")
-        val errorMessage = "Details not found"
-        coEvery { mockCryptoRepository.getDetails(cryptoId) } returns Result.failure(Exception(errorMessage))
+        coEvery { mockCryptoRepository.getDetails(cryptoId) } returns Result.failure(AppException(AppError.Network))
 
         viewModel.uiEvents.test {
             // When
-            viewModel.fetchCryptoDetail(fakeIncompleteCrypto)
+            viewModel.fetchCryptoDetail(cryptoId)
             // Then
             val event = awaitItem()
             assert(event is CryptoViewModel.UiEvent.ShowError)
-            assertEquals(errorMessage, (event as CryptoViewModel.UiEvent.ShowError).message)
+            val expectedError = AppException(AppError.Network).toUiString() as UiString.StringRes
+            val actual = (event as CryptoViewModel.UiEvent.ShowError).message as UiString.StringRes
+            assertEquals(expectedError.resId, actual.resId)
         }
     }
 }
