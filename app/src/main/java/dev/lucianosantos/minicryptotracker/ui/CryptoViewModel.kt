@@ -2,8 +2,12 @@ package dev.lucianosantos.minicryptotracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.lucianosantos.minicryptotracker.R
 import dev.lucianosantos.minicryptotracker.model.CryptoDomain
-import dev.lucianosantos.minicryptotracker.model.CryptoRepository
+import dev.lucianosantos.minicryptotracker.data.CryptoRepository
+import dev.lucianosantos.minicryptotracker.model.AppError
+import dev.lucianosantos.minicryptotracker.model.AppException
+import dev.lucianosantos.minicryptotracker.utils.UiString
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +32,7 @@ class CryptoViewModel(
     )
 
     sealed class UiEvent {
-        data class ShowError(val message: String) : UiEvent()
+        data class ShowError(val message: UiString) : UiEvent()
     }
 
     init {
@@ -55,22 +59,12 @@ class CryptoViewModel(
         }
         viewModelScope.launch {
             val items = cryptoRepository.syncRemote()
-            if (items.isSuccess) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
-                _uiEvents.trySend(
-            UiEvent.ShowError(items.exceptionOrNull()?.message ?: "Unknown error")
-                )
+            if (items.isFailure) {
+               val error = items.exceptionOrNull() ?: AppException(AppError.Unknown)
+               val appError = error.toUiString()
+                _uiEvents.trySend(UiEvent.ShowError(appError))
             }
+            _uiState.update { it.copy(isLoading = false)}
         }
     }
 
@@ -89,14 +83,34 @@ class CryptoViewModel(
                         )
                     }
                 } else {
-                    _uiEvents.trySend(UiEvent.ShowError("Crypto details not found"))
+                    _uiEvents.trySend(UiEvent.ShowError(UiString.StringRes(R.string.error_detail_not_found)))
                 }
             } else {
-                _uiEvents.trySend(UiEvent.ShowError(result.exceptionOrNull()?.message ?: "Unknown error"))
+                val error = result.exceptionOrNull() ?: AppException(AppError.Unknown)
+                val appError = error.toUiString()
+                _uiEvents.trySend(UiEvent.ShowError(appError))
             }
             _uiState.update {
                 it.copy(isLoading = false)
             }
+        }
+    }
+
+    private fun Throwable.toUiString(): UiString {
+        return when (this) {
+            is AppException -> when (error) {
+                AppError.Network -> UiString.StringRes(R.string.error_network)
+                AppError.BadRequest -> UiString.StringRes(R.string.error_bad_request)
+                AppError.Unauthorized -> UiString.StringRes(R.string.error_unauthorized)
+                AppError.Forbidden -> UiString.StringRes(R.string.error_forbidden)
+                AppError.NotFound -> UiString.StringRes(R.string.error_not_found)
+                AppError.Server -> UiString.StringRes(R.string.error_server)
+                AppError.RateLimitExceeded -> UiString.StringRes(R.string.error_rate_limit_exceeded)
+                AppError.UnexpectedResponse -> UiString.StringRes(R.string.error_unexpected_response)
+                is AppError.Backend -> UiString.StringRes(R.string.error_backend, error.code, error.message)
+                else -> UiString.StringRes(R.string.error_unknown)
+            }
+            else -> UiString.StringRes(R.string.error_unknown)
         }
     }
 }

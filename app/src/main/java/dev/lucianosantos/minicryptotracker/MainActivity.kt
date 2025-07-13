@@ -10,7 +10,7 @@ import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-import dev.lucianosantos.minicryptotracker.model.CryptoRepositoryImpl
+import dev.lucianosantos.minicryptotracker.data.CryptoRepositoryImpl
 import dev.lucianosantos.minicryptotracker.database.CryptoDatabase
 import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
 import dev.lucianosantos.minicryptotracker.ui.App

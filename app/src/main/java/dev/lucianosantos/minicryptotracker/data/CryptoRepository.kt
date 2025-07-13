@@ -1,5 +1,6 @@
-package dev.lucianosantos.minicryptotracker.model
+package dev.lucianosantos.minicryptotracker.data
 
+import dev.lucianosantos.minicryptotracker.model.CryptoDomain
 import kotlinx.coroutines.flow.Flow
 
 interface CryptoRepository {

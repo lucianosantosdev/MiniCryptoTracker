@@ -56,7 +56,7 @@ fun CryptoListScreen(
             is CryptoViewModel.UiEvent.ShowError -> {
                 val errorMessage = event.message
                 val snackbarResult = snackbarHostState.showSnackbar(
-                    message = errorMessage,
+                    message = errorMessage.asString(context),
                     actionLabel = context.getString(R.string.snackbar_action_retry),
                     duration = SnackbarDuration.Long
                 )

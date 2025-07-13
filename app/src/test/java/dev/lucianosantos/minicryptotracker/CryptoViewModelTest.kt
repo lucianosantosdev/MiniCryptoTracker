@@ -2,7 +2,7 @@ package dev.lucianosantos.minicryptotracker
 
 import app.cash.turbine.test
 import dev.lucianosantos.minicryptotracker.model.CryptoDomain
-import dev.lucianosantos.minicryptotracker.model.CryptoRepository
+import dev.lucianosantos.minicryptotracker.data.CryptoRepository
 import dev.lucianosantos.minicryptotracker.ui.CryptoViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -16,4 +16,18 @@
     <string name="error_image_not_found">Image not found</string>
     <string name="label_no_price">Price not available</string>
     <string name="label_no_description">No description available</string>
+
+    <!-- Error messages -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_unknown">Unknown error occurred.</string>
+    <string name="error_detail_not_found">Details not found for this cryptocurrency.</string>
+
+    <string name="error_bad_request">Bad request. Please try again.</string>
+    <string name="error_unauthorized">Unauthorized access.</string>
+    <string name="error_forbidden">Access forbidden. You do not have permission to view this resource.</string>
+    <string name="error_not_found">Resource not found.</string>
+    <string name="error_server">Server error. Please try again later.</string>
+    <string name="error_rate_limit_exceeded">Rate limit exceeded. Please wait before trying again.</string>
+    <string name="error_unexpected_response">Unexpected response from the server. Please try again.</string>
+    <string name="error_backend">Code: %1$s, Message: %2$s</string>
 </resources>

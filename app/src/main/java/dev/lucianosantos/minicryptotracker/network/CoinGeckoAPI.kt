@@ -51,5 +51,4 @@ interface CoinGeckoAPI {
 
         }
     }
-
 }

@@ -1,11 +1,19 @@
-package dev.lucianosantos.minicryptotracker.model
+package dev.lucianosantos.minicryptotracker.data
 
 import dev.lucianosantos.minicryptotracker.database.CryptoDao
 import dev.lucianosantos.minicryptotracker.database.CryptoEntity
+import dev.lucianosantos.minicryptotracker.model.AppError
+import dev.lucianosantos.minicryptotracker.model.AppException
+import dev.lucianosantos.minicryptotracker.model.CryptoDomain
+import dev.lucianosantos.minicryptotracker.model.toAppError
 import dev.lucianosantos.minicryptotracker.network.CoinDetailsDto
 import dev.lucianosantos.minicryptotracker.network.CoinDto
 import dev.lucianosantos.minicryptotracker.network.CoinGeckoAPI
+import dev.lucianosantos.minicryptotracker.network.ErrorStatusDto
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import retrofit2.HttpException
+import java.io.IOException
 
 class CryptoRepositoryImpl(
     private val cryptoDao: CryptoDao,
@@ -28,17 +36,20 @@ class CryptoRepositoryImpl(
         return try {
             val response = coinGeckoAPI.getCoinsList()
             if (response.isSuccessful) {
-                val items = response.body()?.map { coin ->
-                    coin.toDomain()
-                } ?: emptyList()
+                val items = response.body()?.map { it.toDomain() }.orEmpty()
                 cacheItems(items)
                 Result.success(Unit)
             } else {
-                val errorBody = response.errorBody()?.string()
-                Result.failure(Exception("Server error: ${response.code()} - ${errorBody ?: "Unknown"}"))
+                val appError = response.errorBody()?.toAppError() ?: AppError.Unknown
+                Result.failure(AppException(appError))
             }
+        } catch (e: IOException) {
+            Result.failure(AppException(AppError.Network))
+        } catch (e: HttpException) {
+            val appError = e.toAppError()
+            Result.failure(AppException(appError))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(AppException(AppError.Unknown))
         }
     }
 
@@ -46,15 +57,21 @@ class CryptoRepositoryImpl(
         return try {
             val response = coinGeckoAPI.getCoinDetails(id)
             if (response.isSuccessful) {
-                val coin = response.body()?.toDomain() ?: return Result.failure(Exception("Coin not found"))
+                val coin = response.body()?.toDomain()
+                    ?: return Result.failure(AppException(AppError.UnexpectedResponse))
                 cacheDetails(coin)
                 Result.success(coin)
             } else {
-                val errorBody = response.errorBody()?.string()
-                Result.failure(Exception("Server error: ${response.code()} - ${errorBody ?: "Unknown"}"))
+                val appError = response.errorBody()?.toAppError() ?: AppError.Unknown
+                Result.failure(AppException(appError))
             }
+        } catch (e: IOException) {
+            Result.failure(AppException(AppError.Network))
+        } catch (e: HttpException) {
+            val appError = e.toAppError()
+            Result.failure(AppException(appError))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(AppException(AppError.Unknown))
         }
     }
 
