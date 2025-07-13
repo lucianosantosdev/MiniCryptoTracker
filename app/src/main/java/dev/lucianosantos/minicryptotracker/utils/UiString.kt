@@ -8,6 +8,7 @@ sealed class UiString {
         @androidx.annotation.StringRes val resId: Int,
         vararg val args: Any
     ) : UiString()
+
     data class StringRaw(val value: String) : UiString()
 
     @Composable

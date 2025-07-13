@@ -18,7 +18,7 @@ import java.io.IOException
 class CryptoRepositoryImpl(
     private val cryptoDao: CryptoDao,
     private val coinGeckoAPI: CoinGeckoAPI
-): CryptoRepository {
+) : CryptoRepository {
 
     override val cryptoCoins = cryptoDao.getAll().map { entities ->
         entities.map { entity ->
@@ -74,7 +74,7 @@ class CryptoRepositoryImpl(
             Result.failure(AppException(AppError.Unknown))
         }
     }
-
+    
     private suspend fun cacheItems(cryptos: List<CryptoDomain>) {
         cryptoDao.insertAll(cryptos.map { it.toEntity() })
     }

@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
                 .crossfade(true)
                 .build()
         }
-
         val database = CryptoDatabase.create(applicationContext)
         val repository = CryptoRepositoryImpl(
             cryptoDao = database.cryptoDao(),

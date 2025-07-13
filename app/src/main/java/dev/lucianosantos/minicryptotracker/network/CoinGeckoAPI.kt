@@ -43,11 +43,11 @@ interface CoinGeckoAPI {
                 ignoreUnknownKeys = true
             }
             return Retrofit.Builder()
-                    .baseUrl("https://api.coingecko.com/api/v3/")
-                    .client(client)
-                    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-                    .build()
-                    .create(CoinGeckoAPI::class.java)
+                .baseUrl("https://api.coingecko.com/api/v3/")
+                .client(client)
+                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                .build()
+                .create(CoinGeckoAPI::class.java)
 
         }
     }

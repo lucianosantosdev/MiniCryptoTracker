@@ -109,7 +109,7 @@ fun CryptoDetailScreenContent(
             ) {
                 Text(text = stringResource(R.string.error_failed_to_load_data))
                 Button(onClick = onRetryClick) {
-                    Text (text = stringResource(R.string.snackbar_action_retry))
+                    Text(text = stringResource(R.string.snackbar_action_retry))
                 }
             }
         }
@@ -133,11 +133,11 @@ fun CryptoDetails(
     description: String?
 ) {
     val scrollState = rememberScrollState()
-            Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-            ) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ) {
         CryptoImage(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -146,13 +146,18 @@ fun CryptoDetails(
         )
         DetailItem(R.string.label_name, name)
         DetailItem(R.string.label_symbol, symbol)
-        DetailItem(R.string.label_price, currentPrice?.toUsdCurrencyString() ?: stringResource(R.string.label_no_price))
+        DetailItem(
+            R.string.label_price,
+            currentPrice?.toUsdCurrencyString() ?: stringResource(R.string.label_no_price)
+        )
         DetailItem(
             R.string.label_description,
-            description.takeUnless { it.isNullOrEmpty() } ?: stringResource(R.string.label_no_description)
+            description.takeUnless { it.isNullOrEmpty() }
+                ?: stringResource(R.string.label_no_description)
         )
     }
 }
+
 @Composable
 fun CryptoImage(
     modifier: Modifier = Modifier,

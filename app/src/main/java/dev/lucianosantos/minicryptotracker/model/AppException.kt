@@ -15,7 +15,7 @@ sealed class AppError {
     data object Forbidden : AppError()
     data object NotFound : AppError()
     data object Server : AppError()
-    data object RateLimitExceeded: AppError()
+    data object RateLimitExceeded : AppError()
     data object UnexpectedResponse : AppError()
     data class Backend(val code: Int, val message: String) : AppError()
 }
@@ -45,11 +45,10 @@ fun ResponseBody.toAppError(): AppError {
             429 -> AppError.RateLimitExceeded
             500 -> AppError.Server
             else -> null
-        } ?:
-            AppError.Backend(
-                code = errorStatus.status.errorCode,
-                message = errorStatus.status.errorMessage
-            )
+        } ?: AppError.Backend(
+            code = errorStatus.status.errorCode,
+            message = errorStatus.status.errorMessage
+        )
     } catch (e: Exception) {
         AppError.Unknown
     }

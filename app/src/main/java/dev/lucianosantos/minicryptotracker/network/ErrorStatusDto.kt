@@ -9,7 +9,7 @@ data class ErrorStatusDto(
 ) {
     @Serializable
     data class Status(
-        @SerialName("error_code")    val errorCode: Int,
+        @SerialName("error_code") val errorCode: Int,
         @SerialName("error_message") val errorMessage: String
     )
 }

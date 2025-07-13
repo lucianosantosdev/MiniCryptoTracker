@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class CryptoRepositoryFakeImpl: CryptoRepository {
+class CryptoRepositoryFakeImpl : CryptoRepository {
     private val fakeCoins = listOf(
         CryptoDomain(
             id = "1",

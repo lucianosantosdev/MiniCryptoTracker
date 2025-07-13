@@ -16,9 +16,15 @@ fun Throwable.toUiString(): UiString {
             AppError.Server -> UiString.StringRes(R.string.error_server)
             AppError.RateLimitExceeded -> UiString.StringRes(R.string.error_rate_limit_exceeded)
             AppError.UnexpectedResponse -> UiString.StringRes(R.string.error_unexpected_response)
-            is AppError.Backend -> UiString.StringRes(R.string.error_backend, error.code, error.message)
+            is AppError.Backend -> UiString.StringRes(
+                R.string.error_backend,
+                error.code,
+                error.message
+            )
+
             else -> UiString.StringRes(R.string.error_unknown)
         }
+
         else -> UiString.StringRes(R.string.error_unknown)
     }
 }

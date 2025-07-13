@@ -85,7 +85,7 @@ fun CryptoListScreenContent(
     var searchQuery by remember { mutableStateOf("") }
     val filteredCryptoList = cryptoList.filter { crypto ->
         crypto.name.contains(searchQuery, ignoreCase = true) ||
-        crypto.symbol.contains(searchQuery, ignoreCase = true)
+                crypto.symbol.contains(searchQuery, ignoreCase = true)
     }
     PullToRefreshBox(
         isRefreshing = isLoading,
@@ -143,13 +143,14 @@ fun SearchBar(
         placeholder = { Text(text = stringResource(R.string.search_bar_hint)) }
     )
 }
+
 @Composable
 fun CryptoListItem(
     cryptoDomain: CryptoDomain,
     onClick: (CryptoDomain) -> Unit
 ) {
     ListItem(
-        modifier = Modifier.clickable{
+        modifier = Modifier.clickable {
             onClick(cryptoDomain)
         },
         headlineContent = {
