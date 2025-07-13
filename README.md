@@ -9,8 +9,8 @@ The project is organized as follows:
 - **app/src/main/java/dev/lucianosantos/minicryptotracker/**: Contains the main Kotlin source files for the application, organized into the following subfolders:
   - **data/**: Handles data-related operations, including repositories and data sources.
   - **model/**: Contains data models and entities used throughout the application.
-  - **network/**: Manages API calls and network-related functionality, including Retrofit services.
-  - **database/**: Contains Room database setup and related DAOs.
+  - **network/**: Manages API calls and network-related functionality, including Retrofit services and related DTOs.
+  - **database/**: Contains Room database setup, related DAOs and Entities.
   - **ui/**: Includes UI components and screens built using Jetpack Compose.
   - **utils/**: Provides utility classes and helper functions.
 - **app/src/main/res/**: Contains resources such as layouts, drawables, and values.
