@@ -5,6 +5,7 @@
     <string name="screen_list_title">Cryto List</string>
     <string name="snackbar_action_retry">RETRY</string>
     <string name="search_bar_hint">Search cryptocurrencies...</string>
+    <string name="error_failed_to_load_data">Failed to load data. Please try again latter.</string>
 
     <!-- Details screen -->
     <string name="screen_details_title">Crypto Details</string>

@@ -2,7 +2,9 @@ package dev.lucianosantos.minicryptotracker.ui.screens
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -74,14 +77,16 @@ fun CryptoDetailScreen(
     }
     CryptoDetailScreenContent(
         isLoading = uiState.isLoading,
-        crypto = uiState.selectedCrypto
+        crypto = uiState.selectedCrypto,
+        onRetryClick = { viewModel.fetchCryptoDetail(cryptoId) }
     )
 }
 
 @Composable
 fun CryptoDetailScreenContent(
     isLoading: Boolean,
-    crypto: CryptoDomain? = null,
+    crypto: CryptoDomain?,
+    onRetryClick: () -> Unit
 ) {
     if (isLoading) {
         Box(
@@ -92,30 +97,62 @@ fun CryptoDetailScreenContent(
         }
         return
     }
-    crypto?.let {
-        val scrollState = rememberScrollState()
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
+    if (crypto == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            CryptoImage(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp),
-                imageUrl = it.imageUrl ?: ""
-            )
-            DetailItem(R.string.label_name, it.name)
-            DetailItem(R.string.label_symbol, it.symbol)
-            DetailItem(R.string.label_price, it.currentPrice?.toUsdCurrencyString() ?: stringResource(R.string.label_no_price))
-            DetailItem(
-                R.string.label_description,
-                it.description.takeUnless { it.isNullOrEmpty() } ?: stringResource(R.string.label_no_description)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(text = stringResource(R.string.error_failed_to_load_data))
+                Button(onClick = onRetryClick) {
+                    Text (text = stringResource(R.string.snackbar_action_retry))
+                }
+            }
         }
+    } else {
+        CryptoDetails(
+            name = crypto.name,
+            symbol = crypto.symbol,
+            imageUrl = crypto.imageUrl,
+            currentPrice = crypto.currentPrice,
+            description = crypto.description
+        )
     }
 }
 
+@Composable
+fun CryptoDetails(
+    name: String,
+    symbol: String,
+    imageUrl: String?,
+    currentPrice: Double?,
+    description: String?
+) {
+    val scrollState = rememberScrollState()
+            Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+            ) {
+        CryptoImage(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp),
+            imageUrl = imageUrl ?: ""
+        )
+        DetailItem(R.string.label_name, name)
+        DetailItem(R.string.label_symbol, symbol)
+        DetailItem(R.string.label_price, currentPrice?.toUsdCurrencyString() ?: stringResource(R.string.label_no_price))
+        DetailItem(
+            R.string.label_description,
+            description.takeUnless { it.isNullOrEmpty() } ?: stringResource(R.string.label_no_description)
+        )
+    }
+}
 @Composable
 fun CryptoImage(
     modifier: Modifier = Modifier,
@@ -188,7 +225,8 @@ fun CryptoDetailScreenPreview() {
                     description = "Bitcoin is a decentralized digital currency.",
                     currentPrice = 50000.0
                 ),
-                isLoading = false
+                isLoading = false,
+                onRetryClick = { /* No-op for preview */ }
             )
         }
     }
