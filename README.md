@@ -24,7 +24,7 @@ The project is organized as follows:
 ### Prerequisites
 
 1. Install Android Studio.
-2. Ensure you have the latest Android SDK and Kotlin plugin installed.
+2. Ensure you have the latest Android SDK installed.
 3. Set up a CoinGecko API token.
 
 ### Steps
