@@ -53,6 +53,14 @@ The project is organized as follows:
    - Connect an Android device or start an emulator.
    - Click on "Run"
 
+### Alternative: Download Pre-built APK
+
+You can also test the application by downloading the latest unsigned APK from the GitHub Actions artifacts:
+1. Go to the repository's Actions tab
+2. Select the most recent successful workflow run
+3. Download the APK artifact
+4. Install the APK on your Android device (make sure to enable "Install from unknown sources" in your device settings)
+
 ## Dependencies
 
 The project uses the following key dependencies:
