@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -35,19 +36,14 @@ val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")
 }
 
-sealed class Route {
-    object CryptoList: Route()
-    data class CryptoDetail(
-        val cryptoId: String
-    ): Route()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
     viewModel: CryptoViewModel
 ) {
-    var currentRoute: Route by remember { mutableStateOf(Route.CryptoList) }
+    var currentRoute by rememberSaveable(stateSaver = RouteSaver) {
+        mutableStateOf(Route.CryptoList)
+    }
     val snackbarHostState = remember { SnackbarHostState() }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {

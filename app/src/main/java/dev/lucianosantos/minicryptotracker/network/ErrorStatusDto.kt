@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ErrorStatusDto(
-    val status: Status
+    val status: Status? = null,
+    val error: String? = null,
 ) {
     @Serializable
     data class Status(

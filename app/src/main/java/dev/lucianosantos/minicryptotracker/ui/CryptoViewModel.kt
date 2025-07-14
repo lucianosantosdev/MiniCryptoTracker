@@ -71,7 +71,10 @@ class CryptoViewModel(
 
     fun fetchCryptoDetail(cryptoId: String) {
         _uiState.update {
-            it.copy(isLoading = true)
+            it.copy(
+                isLoading = true,
+                selectedCrypto = null
+            )
         }
         viewModelScope.launch {
             val result = cryptoRepository.getDetails(cryptoId)

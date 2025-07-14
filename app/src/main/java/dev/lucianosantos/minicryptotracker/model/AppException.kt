@@ -4,6 +4,7 @@ import dev.lucianosantos.minicryptotracker.network.ErrorStatusDto
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.HttpException
+import retrofit2.Response
 
 class AppException(val error: AppError) : Exception()
 
@@ -21,7 +22,6 @@ sealed class AppError {
 }
 
 fun HttpException.toAppError(): AppError {
-    val errorBody = response()?.errorBody()
     return when (code()) {
         400 -> AppError.BadRequest
         401 -> AppError.Unauthorized
@@ -29,15 +29,21 @@ fun HttpException.toAppError(): AppError {
         404 -> AppError.NotFound
         500 -> AppError.Server
         else -> {
-            errorBody?.toAppError() ?: AppError.Unknown
+            response()?.toAppError() ?: AppError.Unknown
         }
     }
 }
 
-fun ResponseBody.toAppError(): AppError {
+fun <T>  Response<T>.toAppError(): AppError {
+    val errorBody = errorBody()
+
+
     return try {
-        val errorStatus = Json.decodeFromString<ErrorStatusDto>(string())
-        return when (errorStatus.status.errorCode) {
+        val errorDto = errorBody?.let {
+            Json.decodeFromString<ErrorStatusDto>(errorBody.string())
+        }
+        val errorCode = errorDto?.status?.errorCode ?: code()
+        return when (errorCode) {
             400 -> AppError.BadRequest
             401 -> AppError.Unauthorized
             403 -> AppError.Forbidden
@@ -45,10 +51,12 @@ fun ResponseBody.toAppError(): AppError {
             429 -> AppError.RateLimitExceeded
             500 -> AppError.Server
             else -> null
-        } ?: AppError.Backend(
-            code = errorStatus.status.errorCode,
-            message = errorStatus.status.errorMessage
-        )
+        } ?: errorDto?.let { it ->
+            AppError.Backend(
+                code = it.status?.errorCode ?: code(),
+                message = it.status?.errorMessage ?: it.error ?: ""
+            )
+        } ?: AppError.UnexpectedResponse
     } catch (e: Exception) {
         AppError.Unknown
     }

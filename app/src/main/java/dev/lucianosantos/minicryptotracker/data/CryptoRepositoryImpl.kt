@@ -40,7 +40,7 @@ class CryptoRepositoryImpl(
                 cacheItems(items)
                 Result.success(Unit)
             } else {
-                val appError = response.errorBody()?.toAppError() ?: AppError.Unknown
+                val appError = response.toAppError()
                 Result.failure(AppException(appError))
             }
         } catch (e: IOException) {
@@ -62,7 +62,7 @@ class CryptoRepositoryImpl(
                 cacheDetails(coin)
                 Result.success(coin)
             } else {
-                val appError = response.errorBody()?.toAppError() ?: AppError.Unknown
+                val appError = response.toAppError()
                 Result.failure(AppException(appError))
             }
         } catch (e: IOException) {
